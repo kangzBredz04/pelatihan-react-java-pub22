@@ -1,4 +1,4 @@
-package pertemuan_1;
+package pertemuan_satu;
 
 public class Main {
     public static void main(String[] args) {

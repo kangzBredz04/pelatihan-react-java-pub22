@@ -1,4 +1,4 @@
-package pertemuan_1;
+package pertemuan_satu;
 
 import java.util.Scanner;
 
