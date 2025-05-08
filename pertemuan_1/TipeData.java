@@ -1,3 +1,5 @@
+package pertemuan_1;
+
 public class TipeData {
     public static void main(String[] args) {
         // === Tipe Data Primitif ===
