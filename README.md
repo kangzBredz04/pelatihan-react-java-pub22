@@ -10,28 +10,47 @@ Repositori ini berisi seluruh materi, modul praktik, dan proyek akhir dari pelat
 
 ---
 
-## 📚 Kurikulum Singkat
+## 📘 Kurikulum & Jadwal Pelatihan Lengkap
 
-Pelatihan ini dibagi menjadi 2 fase utama:
+### Fase 1 – Java + Spring Boot REST API (Pertemuan 1–12)
 
-### 🧹 Fase 1 – Java + Spring Boot REST API (Pertemuan 1–12)
+| Pertemuan | Tanggal          | Mode    | Materi                                                        |
+| --------- | ---------------- | ------- | ------------------------------------------------------------- |
+| 1         | 10 Mei (Sabtu)   | Offline | Pengenalan Java, Output, Tipe Data, Variabel, Operator, Input |
+| 2         | 11 Mei (Minggu)  | Offline | Struktur Sintaks, Percabangan, Perulangan, Method             |
+| 3         | 18 Mei (Minggu)  | Online  | Pengantar OOP, Class, Object, Access Modifier                 |
+| 4         | 25 Mei (Minggu)  | Online  | Enkapsulasi, Keyword this, Collection Type                    |
+| 5         | 1 Juni (Minggu)  | Online  | CRUD menggunakan Collection Type                              |
+| 6         | 8 Juni (Minggu)  | Online  | Inheritance, Method Overriding                                |
+| 7         | 14 Juni (Sabtu)  | Offline | Abstract Class, Interface, Overloading                        |
+| 8         | 15 Juni (Minggu) | Offline | Pengenalan Spring & Spring Boot                               |
+| 9         | 22 Juni (Minggu) | Online  | Konsep MVC di Java                                            |
+| 10        | 28 Juni (Sabtu)  | Offline | Menggunakan JPA dan Thymeleaf                                 |
+| 11        | 29 Juni (Minggu) | Offline | Simulasi Pembuatan REST API                                   |
+| 12        | 29 Juni (Minggu) | Offline | 📄 UTS: Pembuatan REST API menggunakan Spring Boot            |
 
-- Pengenalan Java, OOP, Collection & Method
-- Penerapan Konsep MVC di Java
-- Spring Boot REST API (CRUD, JPA, Service Layer, DTO, Validation, Swagger)
-
-📝 UTS: Membangun REST API sederhana (29 Juni 2025)
+📢 3 Juli: Pengumuman Nilai UTS
 
 ---
 
-### 🌐 Fase 2 – Integrasi ReactJS + REST API (Pertemuan 13–24)
+### Fase 2 – Integrasi ReactJS + REST API (Pertemuan 13–24)
 
-- Setup project React & pengelolaan state dasar
-- Konsumsi REST API (GET, POST, PUT, DELETE)
-- UI/UX Form, Upload Gambar, Notifikasi, dan Auth Token
-- Deployment aplikasi fullstack
+| Pertemuan | Tanggal             | Mode    | Materi                                            |
+| --------- | ------------------- | ------- | ------------------------------------------------- |
+| 13        | 6 Juli (Minggu)     | Online  | Setup Proyek React, Routing, Struktur Komponen    |
+| 14        | 12 Juli (Sabtu)     | Offline | Konsumsi API (GET) & Tampilkan Data               |
+| 15        | 13 Juli (Minggu)    | Offline | Konsumsi API (POST, PUT, DELETE)                  |
+| 16        | 20 Juli (Minggu)    | Online  | Pembuatan Form & Validasi di React                |
+| 17        | 27 Juli (Minggu)    | Online  | Upload Gambar & Relasi Data (Ex: Produk-Kategori) |
+| 18        | 3 Agustus (Minggu)  | Online  | Autentikasi Login dan Penggunaan Token            |
+| 19        | 9 Agustus (Sabtu)   | Offline | Protected Route & Pengelolaan Session             |
+| 20        | 10 Agustus (Minggu) | Offline | Custom Hook, Loading State, Error Handler         |
+| 21        | 17 Agustus (Minggu) | Online  | Review Integrasi Frontend-Backend                 |
+| 22        | 23 Agustus (Sabtu)  | Offline | Finalisasi Proyek & Deploy                        |
+| 23        | 24 Agustus (Minggu) | Offline | 🎓 Presentasi UAS (Final Project Fullstack)       |
+| 24        | 24 Agustus (Minggu) | Offline | 🎓 Penutupan + Evaluasi                           |
 
-🎓 UAS: Presentasi proyek aplikasi sederhana dengan backend & frontend (24 Agustus 2025)
+📢 28 Agustus: Pengumuman Nilai UAS
 
 ---
 
