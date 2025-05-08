@@ -91,8 +91,8 @@ Gunakan branch sesuai sesi/pertemuan.
 
 ## 📧 Kontak & Informasi
 
-Mentor: [Nama Anda]  
-Email: mentor@reactjava2025.id  
+Mentor: Wahyu  
+Email: wabredz1234@gmail.com/ww4697175@gmail.com  
 Discord/Telegram: (akan dibagikan saat sesi)
 
 ---
