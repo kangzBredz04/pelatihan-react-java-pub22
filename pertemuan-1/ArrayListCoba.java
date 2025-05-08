@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class ArrayList {
+public class ArrayListCoba {
     public static void main(String[] args) {
         // Membuat ArrayList untuk menyimpan string
         ArrayList<String> daftarNama = new ArrayList<>();
