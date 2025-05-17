@@ -1,4 +1,4 @@
-package pertemuan_dua; // 1.1.1 Deklarasi Package
+package pertemuan2; // 1.1.1 Deklarasi Package
 
 import java.util.Scanner; // 1.1.2 Impor Library
 

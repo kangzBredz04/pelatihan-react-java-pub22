@@ -1,4 +1,4 @@
-package pertemuan3;
+package pertemuan2;
 
 import java.util.HashMap;
 import java.util.Map;

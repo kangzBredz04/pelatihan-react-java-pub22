@@ -1,4 +1,4 @@
-package pertemuan_dua;
+package pertemuan2;
 
 public class Percabangan {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package pertemuan3;
+package pertemuan2;
 
 public class Car {
     // attribute

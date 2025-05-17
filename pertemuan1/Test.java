@@ -1,4 +1,4 @@
-package pertemuan_satu;
+package pertemuan1;
 
 import java.util.*;
 import java.io.BufferedReader;
