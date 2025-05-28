@@ -1,0 +1,27 @@
+Mahasiswa {
+    nama : "Wahyu",
+    nim : 123
+}
+
+Mahasiswa.nama
+
+Mahasiswa1 x = new Mahasiswa1();
+
+Constructor
+public Mahasiswa1(){
+
+}
+
+Person
+
+private String nama; // Wahyu
+private int umur; // 21
+
+Person (String nama, int umur){
+    this.nama = nama;
+    this.umur = umur;
+}
+
+Person (){
+
+}
