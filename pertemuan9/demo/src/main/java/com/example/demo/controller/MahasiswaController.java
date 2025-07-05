@@ -49,18 +49,16 @@ public class MahasiswaController {
 
     @GetMapping("/{nim}")
     public Map<String, Object> findMahasiswasByNim(@PathVariable String nim) {
-    List<Mahasiswa> mahasiswas = mahasiswaRepository.findMahasiswasByNim(nim);
-    Map<String, Object> response = new LinkedHashMap<>();
-    if (mahasiswas.isEmpty()) {
-    response.put("message", "Mahasiswa dengan NIM update " + nim + " tidak
-    ditemukan");
-    response.put("data", null);
-    } else {
-    response.put("message", "Data mahasiswa dengan NIM " + nim + " berhasil
-    ditemukan");
-    response.put("data", mahasiswas);
-    }
-    return response;
+        List<Mahasiswa> mahasiswas = mahasiswaRepository.findMahasiswasByNim(nim);
+        Map<String, Object> response = new LinkedHashMap<>();
+        if (mahasiswas.isEmpty()) {
+            response.put("message", "Mahasiswa dengan NIM update " + nim + " tidak ditemukan");
+            response.put("data", null);
+        } else {
+            response.put("message", "Data mahasiswa dengan NIM " + nim + " berhasil ditemukan");
+            response.put("data", mahasiswas);
+        }
+        return response;
     }
 
     @PostMapping("")
@@ -74,37 +72,35 @@ public class MahasiswaController {
 
     @PutMapping("/{nim}")
     public Map<String, Object> updateMahasiswa(@PathVariable String nim,
-    @RequestBody Mahasiswa newMahasiswa) {
-    List<Mahasiswa> mahasiswas = mahasiswaRepository.findMahasiswasByNim(nim);
-    Map<String, Object> response = new LinkedHashMap<>();
-    if (mahasiswas == null) {
-    response.put("message", "Mahasiswa dengan NIM " + nim + " tidak ditemukan");
-    response.put("data", null);
-    } else {
-    Mahasiswa exsiting = mahasiswas.get(0);
-    exsiting.setNama(newMahasiswa.getNama());
-    Mahasiswa updatedMahasiswa = mahasiswaRepository.save(exsiting);
-    response.put("message", "Data mahasiswa dengan NIM " + nim + " berhasil
-    diperbarui");
-    response.put("data", updatedMahasiswa);
-    }
-    return response;
+            @RequestBody Mahasiswa newMahasiswa) {
+        List<Mahasiswa> mahasiswas = mahasiswaRepository.findMahasiswasByNim(nim);
+        Map<String, Object> response = new LinkedHashMap<>();
+        if (mahasiswas == null) {
+            response.put("message", "Mahasiswa dengan NIM " + nim + " tidak ditemukan");
+            response.put("data", null);
+        } else {
+            Mahasiswa exsiting = mahasiswas.get(0);
+            exsiting.setNama(newMahasiswa.getNama());
+            Mahasiswa updatedMahasiswa = mahasiswaRepository.save(exsiting);
+            response.put("message", "Data mahasiswa dengan NIM " + nim + " berhasil diperbarui");
+            response.put("data", updatedMahasiswa);
+        }
+        return response;
     }
 
     @DeleteMapping("/{nim}")
     public Map<String, Object> deleteMahasiswa(@PathVariable String nim) {
-    List<Mahasiswa> mahasiswas = mahasiswaRepository.findMahasiswasByNim(nim);
-    Map<String, Object> response = new LinkedHashMap<>();
-    if (mahasiswas == null) {
-    response.put("message", "Mahasiswa dengan NIM " + nim + " tidak ditemukan");
-    response.put("data", null);
-    } else {
-    Mahasiswa toDelete = mahasiswas.get(0);
-    mahasiswaRepository.delete(toDelete);
-    response.put("message", "Data mahasiswa dengan NIM " + nim + " berhasil
-    dihapus");
-    response.put("data", toDelete);
-    }
-    return response;
+        List<Mahasiswa> mahasiswas = mahasiswaRepository.findMahasiswasByNim(nim);
+        Map<String, Object> response = new LinkedHashMap<>();
+        if (mahasiswas == null) {
+            response.put("message", "Mahasiswa dengan NIM " + nim + " tidak ditemukan");
+            response.put("data", null);
+        } else {
+            Mahasiswa toDelete = mahasiswas.get(0);
+            mahasiswaRepository.delete(toDelete);
+            response.put("message", "Data mahasiswa dengan NIM " + nim + " berhasil dihapus");
+            response.put("data", toDelete);
+        }
+        return response;
     }
 }
