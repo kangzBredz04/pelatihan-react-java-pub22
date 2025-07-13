@@ -5,6 +5,7 @@ import ReactDOM from "react-dom/client";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
+import Company from "./pages/Company";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/company",
+        element: <Company />,
       },
     ],
   },

@@ -15,6 +15,9 @@ function App() {
             <li>
               <a href="/login">Login</a>
             </li>
+            <li>
+              <a href="/company">Company</a>
+            </li>
           </ul>
         </nav>
       </header>
