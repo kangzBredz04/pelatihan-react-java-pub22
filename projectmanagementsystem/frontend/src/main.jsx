@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Company from "./pages/Company";
+import "./index.css";
 
 const router = createBrowserRouter([
   {
