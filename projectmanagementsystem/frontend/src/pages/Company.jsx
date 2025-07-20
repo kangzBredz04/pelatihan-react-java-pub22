@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaPlus, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -68,7 +68,10 @@ const Company = () => {
   };
 
   const handleDelete = (id) => {
-    if (!confirm("Are you sure to delete this company?")) return;
+    if (!confirm("Are you sure to delete this company?")) {
+      alert("Delete canceled");
+      return;
+    }
 
     fetch(`${API_BASE_URL}/company/delete/${id}`, { method: "DELETE" })
       .then((res) => {
@@ -76,7 +79,10 @@ const Company = () => {
         fetchCompanies();
         alert("Deleted successfully");
       })
-      .catch((err) => alert("Error: " + err.message));
+      .catch((err) => {
+        alert("Error: " + err.message);
+        console.log(err.message + " " + err.stack);
+      });
   };
 
   const handleEdit = (company) => {
@@ -87,121 +93,201 @@ const Company = () => {
   };
 
   return (
-    <div className="bg-gray-100 flex flex-col items-center py-10 px-4">
-      <div className="bg-white shadow-lg rounded-lg w-full max-w-4xl p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Company List</h2>
+    <div className="min-h-screen bg-gray-50 text-gray-800 py-8 px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-indigo-700">
+            Company Management
+          </h1>
           <button
             onClick={() => {
               setShowForm(true);
               setEditMode(false);
               setNewCompany({ name: "", address: "" });
             }}
-            className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 flex items-center gap-2"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md flex items-center gap-2 transition-colors"
           >
             <FaPlus /> Add Company
           </button>
         </div>
 
-        {loading && <p className="text-blue-500">Loading data...</p>}
-        {error && <p className="text-red-500">Error: {error}</p>}
+        {loading && (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-500"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">Error: {error}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {!loading && !error && (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300 text-sm rounded-lg">
-              <thead>
-                <tr className="bg-gray-200 text-gray-700">
-                  <th className="px-4 py-2 text-left">ID</th>
-                  <th className="px-4 py-2 text-left">Company Name</th>
-                  <th className="px-4 py-2 text-left">Address</th>
-                  <th className="px-4 py-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {companies.map((company, index) => (
-                  <tr
-                    key={company.id}
-                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                  >
-                    <td className="px-4 py-2 border-t">{company.id}</td>
-                    <td className="px-4 py-2 border-t">{company.name}</td>
-                    <td className="px-4 py-2 border-t">{company.address}</td>
-                    <td className="px-4 py-2 border-t space-x-2">
-                      <button
-                        onClick={() => handleEdit(company)}
-                        className="text-yellow-600 hover:text-yellow-800"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(company.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <FaTrash />
-                      </button>
-                    </td>
+          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      No
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Company Name
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Address
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {companies.map((company, index) => (
+                    <tr key={company.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {index + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {company.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {company.address}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-4">
+                          <button
+                            onClick={() => handleEdit(company)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                            title="Edit"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(company.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Delete"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Form */}
+        {showForm && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+              <div className="flex justify-between items-center border-b px-6 py-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {editMode ? "Edit Company" : "Add New Company"}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditMode(false);
+                    setNewCompany({ name: "", address: "" });
+                  }}
+                  className="text-gray-400 hover:text-gray-500"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={newCompany.name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    value={newCompany.address}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                </div>
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false);
+                      setEditMode(false);
+                      setNewCompany({ name: "", address: "" });
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    {editMode ? "Update" : "Submit"}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>
-
-      {/* Modal Form with Blur */}
-      {showForm && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
-            <button
-              onClick={() => {
-                setShowForm(false);
-                setEditMode(false);
-                setNewCompany({ name: "", address: "" });
-              }}
-              className="absolute top-2 right-3 text-gray-500 hover:text-red-600 text-lg"
-            >
-              <FaTimes />
-            </button>
-            <h3 className="text-lg font-semibold mb-4">
-              {editMode ? "Edit Company" : "Add New Company"}
-            </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Company Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={newCompany.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={newCompany.address}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                {editMode ? "Update" : "Submit"}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
