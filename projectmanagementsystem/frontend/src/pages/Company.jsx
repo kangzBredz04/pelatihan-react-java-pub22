@@ -12,6 +12,24 @@ const Company = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [newCompany, setNewCompany] = useState({ name: "", address: "" });
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortAsc, setSortAsc] = useState(true);
+
+  const filteredCompanies = companies
+    .filter(
+      (company) =>
+        company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.address.toLowerCase().includes(searchTerm.toLowerCase())
+      // .... kondisi lain
+    )
+    .sort((a, b) => {
+      if (sortAsc) {
+        return a.name.localeCompare(b.name);
+      } else {
+        return b.name.localeCompare(a.name);
+      }
+    });
+
   useEffect(() => {
     fetchCompanies();
   }, []);
@@ -117,6 +135,24 @@ const Company = () => {
           </div>
         )}
 
+        {/* INPUTAN SEARCH DAN SORTING */}
+        <div className="flex justify-between items-center mb-4">
+          <input
+            type="text"
+            placeholder="Search company by name..."
+            className="border border-gray-300 rounded-md px-4 py-2"
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              // console.log(e.target.value);
+            }}
+          />
+          <button
+            onClick={() => setSortAsc(!sortAsc)}
+            className="ml-4 text-sm text-indigo-600 hover:underline hover:cursor-pointer transition-colors"
+          >
+            Sort by Name : {sortAsc ? "A - Z" : "Z - A"}
+          </button>
+        </div>
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
             <div className="flex">
@@ -173,7 +209,7 @@ const Company = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {companies.map((company, index) => (
+                  {filteredCompanies.map((company, index) => (
                     <tr key={company.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {index + 1}
