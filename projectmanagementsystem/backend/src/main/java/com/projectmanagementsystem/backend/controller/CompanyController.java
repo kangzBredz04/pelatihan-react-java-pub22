@@ -52,4 +52,29 @@ public class CompanyController {
     public void deleteCompany(@PathVariable Long id) {
         companyRepository.deleteById(id);
     }
+
+    @GetMapping("/by-name/{name}")
+    public List<Company> getCompanyByName(@PathVariable String name) {
+        return companyRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    @GetMapping("/by-address/{address}")
+    public List<Company> getCompanyByAddress(@PathVariable String address) {
+        return companyRepository.findByAddressContainingIgnoreCase(address);
+    }
+
+    @GetMapping("/by-name-or-address/{name}/{address}")
+    public List<Company> getCompanyByNameAndAddress(@PathVariable String name, @PathVariable String address) {
+        return companyRepository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCase(name, address);
+    }
+
+    @GetMapping("/by-name-asc")
+    public List<Company> getCompanyByNameAsc() {
+        return companyRepository.findAllByOrderByNameAsc();
+    }
+
+    @GetMapping("/by-name-desc")
+    public List<Company> getCompanyByNameDesc() {
+        return companyRepository.findAllByOrderByNameDesc();
+    }
 }

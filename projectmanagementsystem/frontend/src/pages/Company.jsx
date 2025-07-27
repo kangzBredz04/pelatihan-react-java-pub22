@@ -13,44 +13,78 @@ const Company = () => {
   const [newCompany, setNewCompany] = useState({ name: "", address: "" });
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortAsc, setSortAsc] = useState(true);
+  // const [sortAsc, setSortAsc] = useState(true);
+  const [sortOrder, setSortOrder] = useState("asc");
 
-  const filteredCompanies = companies
-    .filter(
-      (company) =>
-        company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.address.toLowerCase().includes(searchTerm.toLowerCase())
-      // .... kondisi lain
-    )
-    .sort((a, b) => {
-      if (sortAsc) {
-        return a.name.localeCompare(b.name);
+  // const filteredCompanies = companies
+  //   .filter(
+  //     (company) =>
+  //       company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       company.address.toLowerCase().includes(searchTerm.toLowerCase())
+  //     // .... kondisi lain
+  //   )
+  //   .sort((a, b) => {
+  //     if (sortAsc) {
+  //       return a.name.localeCompare(b.name);
+  //     } else {
+  //       return b.name.localeCompare(a.name);
+  //     }
+  //   });
+
+  const fetchCompanies = async () => {
+    try {
+      setLoading(true);
+
+      let url = `${API_BASE_URL}/company`;
+      if (searchTerm) {
+        url = `${url}/by-name-or-address/${searchTerm}/${searchTerm}`;
+      } else if (sortOrder == "asc") {
+        url = `${url}/by-name-asc`;
+      } else if (sortOrder == "desc") {
+        url = `${url}/by-name-desc`;
       } else {
-        return b.name.localeCompare(a.name);
+        url = `${url}/all`;
       }
-    });
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status} ${url}`);
+      }
+      const data = await response.json();
+      setCompanies(data);
+      setLoading(false);
+      // setError(null);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchCompanies();
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      fetchCompanies();
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, sortOrder]);
 
-  const fetchCompanies = () => {
-    setLoading(true);
-    fetch(`${API_BASE_URL}/company/all`)
-      .then((response) => {
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
-      })
-      .then((data) => {
-        setCompanies(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  };
+  // const fetchCompanies = () => {
+  //   setLoading(true);
+  //   fetch(`${API_BASE_URL}/company/all`)
+  //     .then((response) => {
+  //       if (!response.ok)
+  //         throw new Error(`HTTP error! status: ${response.status}`);
+  //       return response.json();
+  //     })
+  //     .then((data) => {
+  //       setCompanies(data);
+  //       setLoading(false);
+  //     })
+  //     .catch((err) => {
+  //       setError(err.message);
+  //       setLoading(false);
+  //     });
+  // };
 
   const handleInputChange = (e) => {
     setNewCompany({ ...newCompany, [e.target.name]: e.target.value });
@@ -141,17 +175,34 @@ const Company = () => {
             type="text"
             placeholder="Search company by name..."
             className="border border-gray-300 rounded-md px-4 py-2"
+            value={searchTerm}
             onChange={(e) => {
-              setSearchTerm(e.target.value);
+              // setSearchTerm(e.target.value);
               // console.log(e.target.value);
+              setSortOrder("");
+              setSearchTerm(e.target.value);
             }}
           />
-          <button
-            onClick={() => setSortAsc(!sortAsc)}
-            className="ml-4 text-sm text-indigo-600 hover:underline hover:cursor-pointer transition-colors"
-          >
-            Sort by Name : {sortAsc ? "A - Z" : "Z - A"}
-          </button>
+          <div className="flex gap-2 ml-4">
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setSortOrder("asc");
+              }}
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              Sort A - Z
+            </button>
+            <button
+              onClick={() => {
+                searchTerm("");
+                setSortOrder("desc");
+              }}
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              Sort Z - A
+            </button>
+          </div>
         </div>
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -209,7 +260,7 @@ const Company = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredCompanies.map((company, index) => (
+                  {companies.map((company, index) => (
                     <tr key={company.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {index + 1}
