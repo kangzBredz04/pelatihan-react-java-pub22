@@ -1,5 +1,15 @@
-import { useEffect, useState } from "react";
-import { FaPlus, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
+import { useEffect, useMemo, useState } from "react";
+import {
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaTimes,
+  FaChevronLeft,
+  FaChevronRight,
+  FaSearch,
+  FaSortAlphaDown,
+  FaSortAlphaUpAlt,
+} from "react-icons/fa";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,80 +21,148 @@ const Company = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [newCompany, setNewCompany] = useState({ name: "", address: "" });
-
   const [searchTerm, setSearchTerm] = useState("");
-  // const [sortAsc, setSortAsc] = useState(true);
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortAsc, setSortAsc] = useState(true);
 
-  // const filteredCompanies = companies
-  //   .filter(
-  //     (company) =>
-  //       company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       company.address.toLowerCase().includes(searchTerm.toLowerCase())
-  //     // .... kondisi lain
-  //   )
-  //   .sort((a, b) => {
-  //     if (sortAsc) {
-  //       return a.name.localeCompare(b.name);
-  //     } else {
-  //       return b.name.localeCompare(a.name);
-  //     }
-  //   });
+  // State for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  const fetchCompanies = async () => {
-    try {
-      setLoading(true);
+  // Memoized filtered companies
+  const filteredCompanies = useMemo(() => {
+    return companies
+      .filter(
+        (company) =>
+          company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          company.address.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        return sortAsc
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      });
+  }, [companies, searchTerm, sortAsc]);
 
-      let url = `${API_BASE_URL}/company`;
-      if (searchTerm) {
-        url = `${url}/by-name-or-address/${searchTerm}/${searchTerm}`;
-      } else if (sortOrder == "asc") {
-        url = `${url}/by-name-asc`;
-      } else if (sortOrder == "desc") {
-        url = `${url}/by-name-desc`;
-      } else {
-        url = `${url}/all`;
-      }
+  // Pagination calculations
+  const totalItems = filteredCompanies.length; // 11
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} ${url}`);
-      }
-      const data = await response.json();
-      setCompanies(data);
-      setLoading(false);
-      // setError(null);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+  // Current page items
+  const currentItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredCompanies.slice(startIndex, endIndex);
+  }, [filteredCompanies, currentPage, itemsPerPage]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortAsc, itemsPerPage]);
+
+  // Navigation functions
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchCompanies();
-    }, 300);
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm, sortOrder]);
+  const renderPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
 
-  // const fetchCompanies = () => {
-  //   setLoading(true);
-  //   fetch(`${API_BASE_URL}/company/all`)
-  //     .then((response) => {
-  //       if (!response.ok)
-  //         throw new Error(`HTTP error! status: ${response.status}`);
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       setCompanies(data);
-  //       setLoading(false);
-  //     })
-  //     .catch((err) => {
-  //       setError(err.message);
-  //       setLoading(false);
-  //     });
-  // };
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      pages.push(
+        <button
+          key={1}
+          onClick={() => goToPage(1)}
+          className={`px-3 py-1 rounded-md ${
+            1 === currentPage
+              ? "bg-indigo-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          } transition-colors`}
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        pages.push(
+          <span key="start-ellipsis" className="px-2 flex items-end">
+            •••
+          </span>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => goToPage(i)}
+          className={`px-3 py-1 rounded-md ${
+            i === currentPage
+              ? "bg-indigo-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          } transition-colors`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(
+          <span key="end-ellipsis" className="px-2 flex items-end">
+            •••
+          </span>
+        );
+      }
+      pages.push(
+        <button
+          key={totalPages}
+          onClick={() => goToPage(totalPages)}
+          className={`px-3 py-1 rounded-md ${
+            totalPages === currentPage
+              ? "bg-indigo-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          } transition-colors`}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return pages;
+  };
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  const fetchCompanies = () => {
+    setLoading(true);
+    fetch(`${API_BASE_URL}/company/all`)
+      .then((response) => {
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        setCompanies(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  };
 
   const handleInputChange = (e) => {
     setNewCompany({ ...newCompany, [e.target.name]: e.target.value });
@@ -121,7 +199,6 @@ const Company = () => {
 
   const handleDelete = (id) => {
     if (!confirm("Are you sure to delete this company?")) {
-      alert("Delete canceled");
       return;
     }
 
@@ -133,7 +210,6 @@ const Company = () => {
       })
       .catch((err) => {
         alert("Error: " + err.message);
-        console.log(err.message + " " + err.stack);
       });
   };
 
@@ -145,68 +221,65 @@ const Company = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 py-8 px-4 sm:px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-indigo-700">
-            Company Management
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 py-8 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">
+              Company Management
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Manage your company records with ease
+            </p>
+          </div>
           <button
             onClick={() => {
               setShowForm(true);
               setEditMode(false);
               setNewCompany({ name: "", address: "" });
             }}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md flex items-center gap-2 transition-colors"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-md hover:shadow-lg"
           >
-            <FaPlus /> Add Company
+            <FaPlus className="text-sm" /> Add Company
           </button>
         </div>
 
-        {loading && (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-          </div>
-        )}
-
-        {/* INPUTAN SEARCH DAN SORTING */}
-        <div className="flex justify-between items-center mb-4">
-          <input
-            type="text"
-            placeholder="Search company by name..."
-            className="border border-gray-300 rounded-md px-4 py-2"
-            value={searchTerm}
-            onChange={(e) => {
-              // setSearchTerm(e.target.value);
-              // console.log(e.target.value);
-              setSortOrder("");
-              setSearchTerm(e.target.value);
-            }}
-          />
-          <div className="flex gap-2 ml-4">
+        {/* Search and Sort Controls */}
+        <div className="bg-white p-4 rounded-xl shadow-sm mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="relative w-full md:w-96">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search companies by name or address..."
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
             <button
-              onClick={() => {
-                setSearchTerm("");
-                setSortOrder("asc");
-              }}
-              className="text-sm text-indigo-600 hover:underline"
+              onClick={() => setSortAsc(!sortAsc)}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Sort A - Z
-            </button>
-            <button
-              onClick={() => {
-                searchTerm("");
-                setSortOrder("desc");
-              }}
-              className="text-sm text-indigo-600 hover:underline"
-            >
-              Sort Z - A
+              {sortAsc ? (
+                <>
+                  <FaSortAlphaDown className="text-indigo-600" />
+                  <span>A-Z</span>
+                </>
+              ) : (
+                <>
+                  <FaSortAlphaUpAlt className="text-indigo-600" />
+                  <span>Z-A</span>
+                </>
+              )}
             </button>
           </div>
         </div>
+
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-            <div className="flex">
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
+            <div className="flex items-center">
               <div className="flex-shrink-0">
                 <svg
                   className="h-5 w-5 text-red-500"
@@ -221,86 +294,168 @@ const Company = () => {
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">Error: {error}</p>
+                <p className="text-sm text-red-700">
+                  <span className="font-medium">Error:</span> {error}
+                </p>
               </div>
             </div>
           </div>
         )}
 
-        {!loading && !error && (
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      No
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Company Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Address
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {companies.map((company, index) => (
-                    <tr key={company.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {index + 1}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {company.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {company.address}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-4">
-                          <button
-                            onClick={() => handleEdit(company)}
-                            className="text-indigo-600 hover:text-indigo-900"
-                            title="Edit"
-                          >
-                            <FaEdit />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(company.id)}
-                            className="text-red-600 hover:text-red-900"
-                            title="Delete"
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
           </div>
+        ) : (
+          <>
+            {/* Company Table */}
+            <div className="bg-white shadow-sm rounded-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        No
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Company Name
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Address
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {currentItems.length > 0 ? (
+                      currentItems.map((company, index) => (
+                        <tr
+                          key={company.id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {(currentPage - 1) * itemsPerPage + index + 1}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
+                            {company.name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {company.address}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
+                            <div className="flex justify-end space-x-3">
+                              <button
+                                onClick={() => handleEdit(company)}
+                                className="text-indigo-600 hover:text-indigo-900 transition-colors p-1 rounded-md hover:bg-indigo-50"
+                                title="Edit"
+                              >
+                                <FaEdit className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(company.id)}
+                                className="text-red-600 hover:text-red-900 transition-colors p-1 rounded-md hover:bg-red-50"
+                                title="Delete"
+                              >
+                                <FaTrash className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="4"
+                          className="px-6 py-4 text-center text-sm text-gray-500"
+                        >
+                          No companies found. Try adjusting your search or add a
+                          new company.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div className="flex items-center space-x-2 mb-4 sm:mb-0">
+                  <span className="text-sm text-gray-700">
+                    Showing{" "}
+                    <span className="font-medium">
+                      {(currentPage - 1) * itemsPerPage + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium">
+                      {Math.min(currentPage * itemsPerPage, totalItems)}
+                    </span>{" "}
+                    of <span className="font-medium">{totalItems}</span>{" "}
+                    {totalItems === 1 ? "result" : "results"}
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  {/* Items per page selector */}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-700">Show:</span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                      className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </div>
+
+                  {/* Page navigation */}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      aria-label="Previous page"
+                    >
+                      <FaChevronLeft className="h-4 w-4" />
+                    </button>
+
+                    <div className="flex space-x-1">{renderPageNumbers()}</div>
+
+                    <button
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="p-2 rounded-md bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      aria-label="Next page"
+                    >
+                      <FaChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
         {/* Modal Form */}
         {showForm && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform transition-all">
               <div className="flex justify-between items-center border-b px-6 py-4">
                 <h3 className="text-lg font-semibold text-gray-900">
                   {editMode ? "Edit Company" : "Add New Company"}
@@ -311,18 +466,19 @@ const Company = () => {
                     setEditMode(false);
                     setNewCompany({ name: "", address: "" });
                   }}
-                  className="text-gray-400 hover:text-gray-500"
+                  className="text-gray-400 hover:text-gray-500 transition-colors p-1 rounded-full hover:bg-gray-100"
                 >
-                  <FaTimes />
+                  <FaTimes className="h-5 w-5" />
                 </button>
               </div>
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 mb-2"
                   >
                     Company Name
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -331,15 +487,17 @@ const Company = () => {
                     value={newCompany.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    placeholder="Enter company name"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="address"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 mb-2"
                   >
                     Address
+                    <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -348,10 +506,11 @@ const Company = () => {
                     value={newCompany.address}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    placeholder="Enter company address"
                   />
                 </div>
-                <div className="flex justify-end space-x-3 pt-4">
+                <div className="flex justify-end space-x-3 pt-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -359,15 +518,15 @@ const Company = () => {
                       setEditMode(false);
                       setNewCompany({ name: "", address: "" });
                     }}
-                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                   >
-                    {editMode ? "Update" : "Submit"}
+                    {editMode ? "Update Company" : "Add Company"}
                   </button>
                 </div>
               </form>
